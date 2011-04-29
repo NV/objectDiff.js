@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Diff JS objects</title>
+	<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<table>
+	<tr>
+		<td><textarea id="a">{
+  a: {
+    b: 1
+  },
+  "2b": {
+    foo: 'bar'
+  }
+}</textarea></td>
+		<td><textarea id="b">{
+  a: {
+    b: 2
+  },
+  x: 1
+}</textarea></td>
+		<td><pre id="result"></pre></td>
+	</tr>
+</table>
+
+<script src="objectDiff.js"></script>
+<script defer>
+var a = document.getElementById('a');
+var b = document.getElementById('b');
+var result = document.getElementById('result');
+
+window.onload =
+a.onpaste = a.onchange = a.oninput =
+b.onpaste = b.onchange = b.oninput = function changed(e) {
+    try {
+		var aObj = eval('(' + a.value + ')');
+		var bObj = eval('(' + b.value + ')');
+    } catch (e) {}
+	var diff = objectDiff(aObj, bObj);
+	result.innerHTML = outputDiff(diff);
+};
+</script>
+</body>
+</html>
