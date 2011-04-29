@@ -4,11 +4,13 @@
 }
 html, body {
 	background: #EEE;
+	font-size: 12px;
 }
 html, body, table, tbody, tr, td {
 	height: 100%
 }
 table {
+	table-layout: fixed;
 	border-collapse: collapse;
 	width: 100%;
 }
