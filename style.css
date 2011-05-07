@@ -4,7 +4,7 @@
 }
 html, body {
 	background: #EEE;
-	font-size: 12px;
+	font: 12px sans-serif;
 }
 html, body, table, tbody, tr, td {
 	height: 100%
@@ -17,13 +17,15 @@ table {
 td {
 	width: 33%;
 	vertical-align: top;
+	text-align: center;
 }
 pre, textarea {
 	height: 99%;
 	width: 99%;
 	margin: auto;
-	border: 0;
 	font: 1em monospace;
+	text-align: left;
+	white-space: pre-wrap;
 }
 ins, del {
 	display: inline-block;
@@ -55,4 +57,33 @@ del span {
 }
 ins span {
 	color: #c2ccb8;
+}
+
+.footer {
+	position: absolute;
+	padding: .2em .5em;
+	right: 10px;
+	bottom: 0;
+}
+
+.error {
+	color: #600;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+	/* In Firefox and Opera all these stuff disables default outline for textarea. Do it just for WebKit. */
+	textarea {
+		border: 1px solid #DDD;
+	}
+	textarea:focus {
+		border-color: #3772ae;
+	}
+	.error {
+		background-color: #fffafa;
+		border-color: #deb1b1;
+		outline-color: #ff7f7f;
+	}
+	.error:focus {
+		border-color: #c46969;
+	}
 }

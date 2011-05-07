@@ -9,7 +9,7 @@
 
 <table>
 	<tr>
-		<td><textarea id="a">{
+		<td><textarea id="a" spellcheck="false">{
   a: {
     b: 1
   },
@@ -17,7 +17,7 @@
     foo: 'bar'
   }
 }</textarea></td>
-		<td><textarea id="b">{
+		<td><textarea id="b" spellcheck="false">{
   a: {
     b: 2
   },
@@ -26,6 +26,8 @@
 		<td><pre id="result"></pre></td>
 	</tr>
 </table>
+
+<a class="footer" href="https://github.com/NV/objectDiff.js">objectDiff.js on GitHub</a>
 
 <script src="objectDiff.js"></script>
 <script defer>
@@ -36,12 +38,33 @@ var result = document.getElementById('result');
 window.onload =
 a.onpaste = a.onchange = a.oninput =
 b.onpaste = b.onchange = b.oninput = function changed(e) {
+
+	var aError;
     try {
 		var aObj = eval('(' + a.value + ')');
+    } catch (e) {
+		aError = true;
+		a.className = 'error';
+	}
+	if (!aError) {
+		a.className = '';
+	}
+
+	var bError;
+	try {
 		var bObj = eval('(' + b.value + ')');
-    } catch (e) {}
-	var diff = objectDiff(aObj, bObj);
-	result.innerHTML = outputDiff(diff);
+	} catch (e) {
+		bError = true;
+		b.className = 'error';
+	}
+	if (!bError) {
+		b.className = '';
+	}
+
+	if (!bError && !aError) {
+		var diff = objectDiff(aObj, bObj);
+		result.innerHTML = outputDiff(diff);
+	}
 };
 </script>
 </body>
