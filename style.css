@@ -76,7 +76,7 @@ ins span {
 		border: 1px solid #DDD;
 	}
 	textarea:focus {
-		border-color: #3772ae;
+		border-color: #6699cc;
 	}
 	.error {
 		background-color: #fffafa;
