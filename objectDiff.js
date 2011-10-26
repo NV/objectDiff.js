@@ -14,8 +14,6 @@ function objectDiff(a, b) {
 
 	var diff = {};
 
-    //TODO: handle circular references
-
 	for (var key in a) {
 		if (key in b) {
 			if (a[key] === b[key]) {
