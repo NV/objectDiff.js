@@ -1,0 +1,53 @@
+#[objectDiff](http://nv.github.com/objectDiff.js/)
+
+[objectdiff on npm](http://search.npmjs.org/#/objectdiff)
+
+
+## objectDiff.diff(objectA, objectB)
+
+<pre>
+objectDiff.diff({x: 1}, {x: 2})
+-> {
+  x: {
+    changed: "primitive change",
+    removed: 1,
+    added: 2
+  }
+}
+
+objectDiff.diff({z: {x: 1}}, {z: {y: 2}})
+-> {
+  z: {
+    changed: "object change",
+    diff: {
+      x: {
+        changed: "removed",
+        value: 1
+      },
+      y: {
+        changed: "added",
+        value:2
+      }
+    }
+  }
+}
+</pre>
+
+
+## objectDiff.diffOwnProperties(objectA, objectB)
+
+Same as objectDiff.diff, but compares only objects' own properties
+
+<pre>
+function A(){}
+A.prototype.x = 1
+objectDiff.diff(new A, {x: 1})
+-> {x: {changed: "equals", value: 1}}
+
+objectDiff.diffOwnProperties(new A, {x: 1})
+-> {x: {changed: "added", value: 1}}
+</pre>
+
+## objectDiff.convertToXMLString(diffObject)
+
+Used on [the demo page](http://nv.github.com/objectDiff.js/).

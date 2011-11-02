@@ -62,8 +62,8 @@ b.onpaste = b.onchange = b.oninput = function changed(e) {
 	}
 
 	if (!bError && !aError) {
-		var diff = objectDiff(aObj, bObj);
-		result.innerHTML = outputDiff(diff);
+		var diff = objectDiff.diffOwnProperties(aObj, bObj);
+		result.innerHTML = objectDiff.convertToXMLString(diff);
 	}
 };
 </script>

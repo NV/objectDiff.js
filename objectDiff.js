@@ -1,9 +1,12 @@
+var objectDiff = typeof exports != 'undefined' ? exports : {};
+
 /**
  * @param {Object} a
  * @param {Object} b
+ * @nosideeffects
  * @return {Object}
  */
-function objectDiff(a, b) {
+objectDiff.diff = function diff(a, b) {
 
 	if (a === b) {
 		return {
@@ -12,12 +15,12 @@ function objectDiff(a, b) {
 		}
 	}
 
-	var diff = {};
+	var result = {};
 
 	for (var key in a) {
 		if (key in b) {
 			if (a[key] === b[key]) {
-				diff[key] = {
+				result[key] = {
 					changed: 'equals',
 					value: a[key]
 				}
@@ -25,12 +28,12 @@ function objectDiff(a, b) {
 				var typeA = typeof a[key];
 				var typeB = typeof b[key];
 				if ((typeA == 'object' || typeA == 'function') && (typeB == 'object' || typeB == 'function')) {
-					diff[key] = {
+					result[key] = {
 						changed: 'object change',
-						diff: objectDiff(a[key], b[key])
+						diff: diff(a[key], b[key])
 					}
 				} else {
-					diff[key] = {
+					result[key] = {
 						changed: 'primitive change',
 						removed: a[key],
 						added: b[key]
@@ -38,7 +41,7 @@ function objectDiff(a, b) {
 				}
 			}
 		} else {
-			diff[key] = {
+			result[key] = {
 				changed: 'removed',
 				value: a[key]
 			}
@@ -47,128 +50,189 @@ function objectDiff(a, b) {
 
 	for (key in b) {
 		if (!(key in a)) {
-			diff[key] = {
+			result[key] = {
 				changed: 'added',
 				value: b[key]
 			}
 		}
 	}
 
-	return diff;
-}
+	return result;
+};
+
 
 /**
- * repeatString("Ha ", 2) ==> "Ha Ha "
- * @param {String} string
- * @param {Number} times
+ * @param {Object} a
+ * @param {Object} b
+ * @nosideeffects
+ * @return {Object}
  */
-function repeatString(string, times) {
-	if (times == 1) {
-		return string;
-	} else if (times < 1) {
-		return '';
+objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
+
+	if (a === b) {
+		return {
+			changed: 'equal',
+			value: a
+		}
 	}
 
-	if (string in repeatString.cache && times in repeatString.cache[string]) {
-		return repeatString.cache[string][times];
-	} else {
-		var result = string;
-		for (var i = times; --i;) {
-			result += string;
+	var result = {};
+	var keys = Object.keys(a);
+
+	for (var i = 0, length = keys.length; i < length; i++) {
+		var key = keys[i];
+		if (b.hasOwnProperty(key)) {
+			if (a[key] === b[key]) {
+				result[key] = {
+					changed: 'equals',
+					value: a[key]
+				}
+			} else {
+				var typeA = typeof a[key];
+				var typeB = typeof b[key];
+				if ((typeA == 'object' || typeA == 'function') && (typeB == 'object' || typeB == 'function')) {
+					result[key] = {
+						changed: 'object change',
+						diff: diffOwnProperties(a[key], b[key])
+					}
+				} else {
+					result[key] = {
+						changed: 'primitive change',
+						removed: a[key],
+						added: b[key]
+					}
+				}
+			}
+		} else {
+			result[key] = {
+				changed: 'removed',
+				value: a[key]
+			}
 		}
-		repeatString.cache[string] || (repeatString.cache[string] = {});
-		repeatString.cache[string][times] = result; 
+	}
+
+	keys = Object.keys(b);
+
+	for (i = 0, length = keys.length; i < length; i++) {
+		key = keys[i];
+		if (!a.hasOwnProperty(key)) {
+			result[key] = {
+				changed: 'added',
+				value: b[key]
+			}
+		}
 	}
 
 	return result;
-}
-repeatString.cache = {};
+};
 
 
-/**
- * @param {string} key
- * @return {string}
- */
-function stringifyObjectKey(key) {
-	return /^[a-z_$][a-z0-9_$]*$/i.test(key) ?
-		key :
-		JSON.stringify(key);
-}
+(function() {
+
+	/**
+	 * @param {Object} diff
+	 * @return {string}
+	 */
+	objectDiff.convertToXMLString = function convertToXMLString(diff) {
+		var output = '';
+		var properties = [];
+
+		for (var key in diff) {
+			var changed = diff[key].changed;
+			switch (changed) {
+				case 'equals':
+					properties.push(stringifyObjectKey(escapeHTML(key)) + '<span>: </span>' + inspect(diff[key].value));
+					break;
+
+				case 'removed':
+					properties.push('<del>' + stringifyObjectKey(escapeHTML(key)) + '<span>: </span>' + inspect(diff[key].value) + '</del>');
+					break;
+
+				case 'added':
+					properties.push('<ins>' + stringifyObjectKey(escapeHTML(key)) + '<span>: </span>' + inspect(diff[key].value) + '</ins>');
+					break;
+
+				case 'primitive change':
+					var prefix = stringifyObjectKey(escapeHTML(key)) + '<span>: </span>';
+					properties.push(
+						'<del class="key">' + prefix + escapeHTML(inspect(diff[key].removed)) + '</del><span>,</span>\n' +
+						'<ins class="key">' + prefix + escapeHTML(inspect(diff[key].added)) + '</ins>');
+					break;
+
+				case 'object change':
+					properties.push(stringifyObjectKey(key) + '<span>: </span>' + convertToXMLString(diff[key].diff));
+					break;
+			}
+		}
+
+		return '<span>{</span>\n<div class="level">' + properties.join('<span>,</span>\n') + '\n</div><span>}</span>';
+	};
 
 
-var INDENT = '  ';
+	var _repeatCache = {};
+	/**
+	 * repeatString("\t", 2) ==> "\t\t"
+	 * @param {String} string
+	 * @param {Number} times
+	 */
+	function repeatString(string, times) {
+		if (times == 1) {
+			return string;
+		} else if (times < 1) {
+			return '';
+		}
 
+		var key = string + times;
 
-/**
- * @param {Object} diff
- * @param {number} depth
- * @return {string}
- */
-function outputDiff(diff, depth) {
-	depth ? depth++ : (depth = 1);
-	var output = '<span>{</span>\n';
-	var properties = [];
+		if (_repeatCache[key]) {
+			return _repeatCache[key];
+		} else {
+			var result = string;
+			for (var i = times; --i;) {
+				result += string;
+			}
+			_repeatCache[key] = result;
+		}
 
-	var indent = repeatString(INDENT, depth - 1);
-	var innerIndent = repeatString(INDENT, depth);
+		return result;
+	}
 
-	for (var key in diff) {
-		var changed = diff[key].changed;
-		switch (changed) {
-			case 'equals':
-				properties.push(innerIndent + stringifyObjectKey(key) + '<span>: </span>' + inspect(diff[key].value, depth));
-				break;
+	/**
+	 * @param {string} key
+	 * @return {string}
+	 */
+	function stringifyObjectKey(key) {
+		return /^[a-z_$][a-z0-9_$]*$/i.test(key) ?
+			key :
+			JSON.stringify(key);
+	}
 
-			case 'removed':
-				properties.push('<del>' + innerIndent + stringifyObjectKey(key) + '<span>: </span>' + inspect(diff[key].value, depth) + '</del>');
-				break;
+	/**
+	 * @param {string} string
+	 * @return {string}
+	 */
+	function escapeHTML(string) {
+		return string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	}
 
-			case 'added':
-				properties.push('<ins>' + innerIndent + stringifyObjectKey(key) + '<span>: </span>' + inspect(diff[key].value, depth) + '</ins>');
-				break;
+	/**
+	 * @param {Object} obj
+	 * @return {string}
+	 */
+	function inspect(obj) {
+		switch(typeof obj) {
+			case 'object':
+				var properties = [];
+				for (var key in obj) {
+					properties.push(stringifyObjectKey(escapeHTML(key)) + '<span>: </span>' + inspect(obj[key]));
+				}
+				return '<span>{</span>\n<div class="level">' + properties.join('<span>,</span>\n') + '\n</div><span>}</span>';
 
-			case 'primitive change':
-				var prefix = innerIndent + stringifyObjectKey(key) + '<span>: </span>';
-				properties.push(
-					'<del class="key">' + prefix + inspect(diff[key].removed, depth) + '</del><span>,</span>\n' +
-					'<ins class="key">' + prefix + inspect(diff[key].added, depth) + '</ins>');
-				break;
+			case 'string':
+				return JSON.stringify(escapeHTML(obj));
 
-			case 'object change':
-				properties.push(innerIndent + stringifyObjectKey(key) + '<span>: </span>' + outputDiff(diff[key].diff, depth));
-				break;
-
+			default:
+				return escapeHTML(obj.toString());
 		}
 	}
-
-	return output + properties.join('<span>,</span>\n') + '\n' + indent + '<span>}</span>';
-}
-
-
-/**
- * @param {Object} obj
- * @param {number} depth
- * @param {Array} stack
- * @return {string}
- */
-function inspect(obj, depth, stack) {
-	depth ? depth++ : (depth = 1);
-	var _stack = stack ? stack.slice(0) : [obj];
-
-	switch(typeof obj) {
-		case 'object':
-			var properties = [];
-			var indent = repeatString(INDENT, depth);
-			for (var key in obj) {
-				properties.push(indent + stringifyObjectKey(key) + '<span>: </span>' + inspect(obj[key], depth, stack));
-			}
-			var indentInside = repeatString(INDENT, depth - 1);
-			return '<span>{</span>\n' + properties.join('<span>,</span>\n') + '\n' + indentInside + '<span>}</span>';
-
-		case 'string':
-			return '"' + obj + '"';
-
-		default:
-			return obj.toString();
-	}
-}
+})();
