@@ -19,7 +19,7 @@ objectDiff.diff({z: {x: 1}}, {z: {y: 2}})
 -> {
   z: {
     changed: "object change",
-    diff: {
+    value: {
       x: {
         changed: "removed",
         value: 1
@@ -41,10 +41,10 @@ Same as objectDiff.diff, but compares only objects' own properties
 <pre>
 function A(){}
 A.prototype.x = 1
-objectDiff.diff(new A, {x: 1})
--> {x: {changed: "equals", value: 1}}
+objectDiff.diff({x: 1}, new A)
+-> {x: {changed: "equal", value: 1}}
 
-objectDiff.diffOwnProperties(new A, {x: 1})
+objectDiff.diffOwnProperties({x: 1}, new A)
 -> {x: {changed: "added", value: 1}}
 </pre>
 
