@@ -189,18 +189,18 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 					break;
 
 				case 'removed':
-					properties.push('<del>' + stringifyObjectKey(escapeHTML(key)) + '<span>: </span>' + inspect(diff[key].value) + '</del>');
+					properties.push('<del class="diff">' + stringifyObjectKey(escapeHTML(key)) + '<span>: </span>' + inspect(diff[key].value) + '</del>');
 					break;
 
 				case 'added':
-					properties.push('<ins>' + stringifyObjectKey(escapeHTML(key)) + '<span>: </span>' + inspect(diff[key].value) + '</ins>');
+					properties.push('<ins class="diff">' + stringifyObjectKey(escapeHTML(key)) + '<span>: </span>' + inspect(diff[key].value) + '</ins>');
 					break;
 
 				case 'primitive change':
 					var prefix = stringifyObjectKey(escapeHTML(key)) + '<span>: </span>';
 					properties.push(
-						'<del class="key">' + prefix + inspect(diff[key].removed) + '</del><span>,</span>\n' +
-						'<ins class="key">' + prefix + inspect(diff[key].added) + '</ins>');
+						'<del class="diff diff-key">' + prefix + inspect(diff[key].removed) + '</del><span>,</span>\n' +
+						'<ins class="diff diff-key">' + prefix + inspect(diff[key].added) + '</ins>');
 					break;
 
 				case 'object change':
@@ -209,7 +209,7 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 			}
 		}
 
-		return '<span>{</span>\n<div class="level">' + properties.join('<span>,</span>\n') + '\n</div><span>}</span>';
+		return '<span>{</span>\n<div class="diff-level">' + properties.join('<span>,</span>\n') + '\n</div><span>}</span>';
 	};
 
 
@@ -246,7 +246,7 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 	 * @return {string}
 	 */
 	function stringifyObjectKey(key) {
-		return /^[a-z_$][a-z0-9_$]*$/i.test(key) ?
+		return /^[a-z0-9_$]*$/i.test(key) ?
 			key :
 			JSON.stringify(key);
 	}
@@ -272,7 +272,7 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 					key = keys[i];
 					properties.push(stringifyObjectKey(escapeHTML(key)) + '<span>: </span>' + inspect(obj[key]));
 				}
-				return properties.length ? '<span>{</span>\n<div class="level">' + properties.join('<span>,</span>\n') + '\n</div><span>}</span>' :
+				return properties.length ? '<span>{</span>\n<div class="diff-level">' + properties.join('<span>,</span>\n') + '\n</div><span>}</span>' :
 					'<span>{}</span>';
 
 			case 'string':

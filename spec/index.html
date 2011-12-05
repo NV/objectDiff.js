@@ -1,0 +1,34 @@
+<!doctype HTML>
+<html>
+<head>
+	<title>objectDiff specs</title>
+
+	<!-- jasmine -->
+	<link rel="icon" href="jasmine/jasmine_favicon.png">
+	<link href="jasmine/jasmine.css" rel="stylesheet">
+	<script src="jasmine/jasmine.js"></script>
+	<script src="jasmine/jasmine-html.js"></script>
+
+	<!-- objectDiff -->
+	<script src="../objectDiff.js"></script>
+	<link href="../objectDiff.css" rel="stylesheet">
+	<script src="../jasmine-objectDiff.js"></script>
+
+	<script src="objectDiff.spec.js"></script>
+
+	<script>
+	var jasmineEnv = jasmine.getEnv();
+	jasmineEnv.addReporter(new jasmine.HtmlReporter);
+	jasmineEnv.updateInterval = 1000;
+
+	beforeEach(function() {
+		this.addMatchers(objectDiff.jasmine);
+	});
+
+	window.onload = function() {
+		jasmineEnv.execute();
+	};
+	</script>
+</head>
+<body></body>
+</html>

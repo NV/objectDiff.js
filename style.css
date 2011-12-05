@@ -1,10 +1,7 @@
-* {
-	margin: 0;
-	padding: 0;
-}
 html, body {
 	background: #EEE;
 	font: 12px sans-serif;
+	margin: 0;
 }
 html, body, table, tbody, tr, td {
 	height: 100%
@@ -19,49 +16,13 @@ td {
 	vertical-align: top;
 	text-align: center;
 }
-pre, textarea {
+#result, textarea {
 	height: 99%;
 	width: 99%;
 	margin: auto;
 	font: 1em monospace;
 	text-align: left;
 	white-space: pre-wrap;
-}
-ins, del {
-	display: inline-block;
-}
-del {
-	text-decoration: none;
-	color: #b30000;
-	background: #fadad7;
-}
-ins {
-	background: #eaf2c2;
-	color: #406619;
-	text-decoration: none;
-}
-del.key {
-	border: 1px solid #f8a4a4;
-	border-bottom-width: 0;
-}
-ins.key {
-	border: 1px solid #a3ce4c;
-	border-top-width: 0;
-}
-
-span {
-	color: #b2b2b2;
-}
-del span {
-	color: #dfb2b2;
-}
-ins span {
-	color: #c2ccb8;
-}
-
-
-.level {
-	margin-left: 1.6em;
 }
 .footer {
 	position: absolute;
