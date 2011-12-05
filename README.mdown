@@ -61,4 +61,4 @@ Used on [the demo page](http://nv.github.com/objectDiff.js/).
 ## Jasmine integration
 
 objectDiff provides `toEqualProperties` and `toEqualOwnProperties` matchers for [Jasmine](http://pivotal.github.com/jasmine/).
-See [example spec](https://github.com/NV/objectDiff.js/spec).
+See [example spec](http://nv.github.com/objectDiff.js/spec/).
