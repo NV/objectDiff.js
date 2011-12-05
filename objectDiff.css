@@ -6,6 +6,7 @@
 }
 .diff-holder {
 	color: #666;
+	margin: 0;
 }
 .diff-holder span {
 	color: #CCC;
