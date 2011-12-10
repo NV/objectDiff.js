@@ -259,27 +259,50 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 		return string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 	}
 
+/**
+ * @param {Object} obj
+ * @return {string}
+ */
+function inspect(obj) {
+
+	return _inspect('', obj);
+
 	/**
-	 * @param {Object} obj
+	 * @param {string} accumulator
+	 * @param {object} obj
+	 * @see http://jsperf.com/continuation-passing-style/3
 	 * @return {string}
 	 */
-	function inspect(obj) {
+	function _inspect(accumulator, obj) {
 		switch(typeof obj) {
 			case 'object':
 				var properties = [];
 				var keys = Object.keys(obj);
-				for (var i = 0, length = keys.length; i < length; i++) {
-					key = keys[i];
-					properties.push(stringifyObjectKey(escapeHTML(key)) + '<span>: </span>' + inspect(obj[key]));
+				var length = keys.length;
+				if (length === 0) {
+					accumulator += '<span>{}</span>';
+				} else {
+					accumulator += '<span>{</span>\n<div class="diff-level">';
+					for (var i = 0; i < length; i++) {
+						var key = keys[i];
+						accumulator = _inspect(accumulator + stringifyObjectKey(escapeHTML(key)) + '<span>: </span>', obj[key]);
+						if (i < length - 1) {
+							accumulator += '<span>,</span>\n';
+						}
+					}
+					accumulator += '\n</div><span>}</span>'
 				}
-				return properties.length ? '<span>{</span>\n<div class="diff-level">' + properties.join('<span>,</span>\n') + '\n</div><span>}</span>' :
-					'<span>{}</span>';
+				break;
 
 			case 'string':
-				return JSON.stringify(escapeHTML(obj));
+				accumulator += JSON.stringify(escapeHTML(obj));
+				break;
 
 			default:
-				return escapeHTML(obj.toString());
+				accumulator += escapeHTML(obj.toString());
+				break;
 		}
+		return accumulator;
 	}
+}
 })();
