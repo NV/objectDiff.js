@@ -1,7 +1,7 @@
 objectDiff.jasmine = {
 
 	toEqualProperties: function(expected) {
-		var diff = objectDiff.diff(this.actual, expected);
+		var diff = objectDiff.diff(expected, this.actual);
 		this.message = function() {
 			var pre = document.createElement('pre');
 			pre.className = 'diff-holder';
@@ -12,7 +12,7 @@ objectDiff.jasmine = {
 	},
 
 	toEqualOwnProperties: function(expected) {
-		var diff = objectDiff.diffOwnProperties(this.actual, expected);
+		var diff = objectDiff.diffOwnProperties(expected, this.actual);
 		this.message = function() {
 			var pre = document.createElement('pre');
 			pre.className = 'diff-holder';
