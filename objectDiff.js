@@ -306,8 +306,12 @@ function inspect(obj) {
 				accumulator += JSON.stringify(escapeHTML(obj));
 				break;
 
+			case 'undefined':
+				accumulator += 'undefined';
+				break;
+
 			default:
-				accumulator += escapeHTML(obj.toString());
+				accumulator += escapeHTML(String(obj));
 				break;
 		}
 		return accumulator;
