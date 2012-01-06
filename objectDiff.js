@@ -28,7 +28,7 @@ objectDiff.diff = function diff(a, b) {
 			} else {
 				var typeA = typeof a[key];
 				var typeB = typeof b[key];
-				if ((typeA == 'object' || typeA == 'function') && (typeB == 'object' || typeB == 'function')) {
+				if (a[key] && b[key] && (typeA == 'object' || typeA == 'function') && (typeB == 'object' || typeB == 'function')) {
 					var valueDiff = diff(a[key], b[key]);
 					if (valueDiff.changed == 'equal') {
 						value[key] = {
@@ -111,7 +111,7 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 			} else {
 				var typeA = typeof a[key];
 				var typeB = typeof b[key];
-				if ((typeA == 'object' || typeA == 'function') && (typeB == 'object' || typeB == 'function')) {
+				if (a[key] && b[key] && (typeA == 'object' || typeA == 'function') && (typeB == 'object' || typeB == 'function')) {
 					var valueDiff = diffOwnProperties(a[key], b[key]);
 					if (valueDiff.changed == 'equal') {
 						diff[key] = {
@@ -276,6 +276,10 @@ function inspect(obj) {
 	function _inspect(accumulator, obj) {
 		switch(typeof obj) {
 			case 'object':
+				if (!obj) {
+					accumulator += 'null';
+					break;
+				}
 				var properties = [];
 				var keys = Object.keys(obj);
 				var length = keys.length;
@@ -292,6 +296,10 @@ function inspect(obj) {
 					}
 					accumulator += '\n</div><span>}</span>'
 				}
+				break;
+
+			case 'null': // ECMAScript 5.1
+				accumulator += 'null';
 				break;
 
 			case 'string':
