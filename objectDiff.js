@@ -298,10 +298,6 @@ function inspect(obj) {
 				}
 				break;
 
-			case 'null': // ECMAScript 5.1
-				accumulator += 'null';
-				break;
-
 			case 'string':
 				accumulator += JSON.stringify(escapeHTML(obj));
 				break;
