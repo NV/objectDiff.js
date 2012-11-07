@@ -210,35 +210,6 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 		return '<span>{</span>\n<div class="diff-level">' + properties.join('<span>,</span>\n') + '\n</div><span>}</span>';
 	};
 
-
-	var _repeatCache = {};
-	/**
-	 * repeatString("\t", 2) ==> "\t\t"
-	 * @param {String} string
-	 * @param {Number} times
-	 */
-	function repeatString(string, times) {
-		if (times == 1) {
-			return string;
-		} else if (times < 1) {
-			return '';
-		}
-
-		var key = string + times;
-
-		if (_repeatCache[key]) {
-			return _repeatCache[key];
-		} else {
-			var result = string;
-			for (var i = times; --i;) {
-				result += string;
-			}
-			_repeatCache[key] = result;
-		}
-
-		return result;
-	}
-
 	/**
 	 * @param {string} key
 	 * @return {string}
