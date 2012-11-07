@@ -228,57 +228,57 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 		return string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 	}
 
-/**
- * @param {Object} obj
- * @return {string}
- */
-function inspect(obj) {
-
-	return _inspect('', obj);
-
 	/**
-	 * @param {string} accumulator
-	 * @param {object} obj
-	 * @see http://jsperf.com/continuation-passing-style/3
+	 * @param {Object} obj
 	 * @return {string}
 	 */
-	function _inspect(accumulator, obj) {
-		switch(typeof obj) {
-			case 'object':
-				if (!obj) {
-					accumulator += 'null';
-					break;
-				}
-				var keys = Object.keys(obj);
-				var length = keys.length;
-				if (length === 0) {
-					accumulator += '<span>{}</span>';
-				} else {
-					accumulator += '<span>{</span>\n<div class="diff-level">';
-					for (var i = 0; i < length; i++) {
-						var key = keys[i];
-						accumulator = _inspect(accumulator + stringifyObjectKey(escapeHTML(key)) + '<span>: </span>', obj[key]);
-						if (i < length - 1) {
-							accumulator += '<span>,</span>\n';
-						}
+	function inspect(obj) {
+
+		return _inspect('', obj);
+
+		/**
+		 * @param {string} accumulator
+		 * @param {object} obj
+		 * @see http://jsperf.com/continuation-passing-style/3
+		 * @return {string}
+		 */
+		function _inspect(accumulator, obj) {
+			switch(typeof obj) {
+				case 'object':
+					if (!obj) {
+						accumulator += 'null';
+						break;
 					}
-					accumulator += '\n</div><span>}</span>'
-				}
-				break;
+					var keys = Object.keys(obj);
+					var length = keys.length;
+					if (length === 0) {
+						accumulator += '<span>{}</span>';
+					} else {
+						accumulator += '<span>{</span>\n<div class="diff-level">';
+						for (var i = 0; i < length; i++) {
+							var key = keys[i];
+							accumulator = _inspect(accumulator + stringifyObjectKey(escapeHTML(key)) + '<span>: </span>', obj[key]);
+							if (i < length - 1) {
+								accumulator += '<span>,</span>\n';
+							}
+						}
+						accumulator += '\n</div><span>}</span>'
+					}
+					break;
 
-			case 'string':
-				accumulator += JSON.stringify(escapeHTML(obj));
-				break;
+				case 'string':
+					accumulator += JSON.stringify(escapeHTML(obj));
+					break;
 
-			case 'undefined':
-				accumulator += 'undefined';
-				break;
+				case 'undefined':
+					accumulator += 'undefined';
+					break;
 
-			default:
-				accumulator += escapeHTML(String(obj));
-				break;
+				default:
+					accumulator += escapeHTML(String(obj));
+					break;
+			}
+			return accumulator;
 		}
-		return accumulator;
 	}
-}
 })();
