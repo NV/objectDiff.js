@@ -280,7 +280,6 @@ function inspect(obj) {
 					accumulator += 'null';
 					break;
 				}
-				var properties = [];
 				var keys = Object.keys(obj);
 				var length = keys.length;
 				if (length === 0) {
