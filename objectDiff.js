@@ -3,7 +3,6 @@ var objectDiff = typeof exports != 'undefined' ? exports : {};
 /**
  * @param {Object} a
  * @param {Object} b
- * @nosideeffects
  * @return {Object}
  */
 objectDiff.diff = function diff(a, b) {
@@ -84,7 +83,6 @@ objectDiff.diff = function diff(a, b) {
 /**
  * @param {Object} a
  * @param {Object} b
- * @nosideeffects
  * @return {Object}
  */
 objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
