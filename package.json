@@ -1,0 +1,33 @@
+{
+  "name": "objectdiff",
+  "description": "Compares JavaScript objects",
+  "keywords": [
+    "diff"
+  ],
+  "version": "1.1.0",
+  "homepage": "https://github.com/NV/objectDiff.js",
+  "author": {
+    "name": "Nikita Vasilyev",
+    "email": "me@elv1s.ru"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/NV/objectDiff.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NV/objectDiff.js/issues"
+  },
+  "files": [
+    "objectDiff.js"
+  ],
+  "main": "objectDiff.js",
+  "engines": {
+    "node": ">=0.2.0"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://creativecommons.org/licenses/MIT/"
+    }
+  ]
+}
