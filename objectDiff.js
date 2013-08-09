@@ -274,7 +274,7 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 					if (length === 0) {
 						accumulator += '<span>{}</span>';
 					} else if (obj.nodeType > 0) {
-						accumulator += '<span>' + toString(obj) + '</span>';
+						accumulator += '<span>' + Object.prototype.toString.call(obj) + '</span>';
 					} else {
 						accumulator += '<span>{</span>\n<div class="diff-level">';
 						for (var i = 0; i < length; i++) {
@@ -290,6 +290,10 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 
 				case 'string':
 					accumulator += JSON.stringify(escapeHTML(obj));
+					break;
+
+				case 'function':
+					accumulator += Object.prototype.toString.call(obj);
 					break;
 
 				case 'undefined':
