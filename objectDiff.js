@@ -13,11 +13,18 @@ objectDiff.diff = function diff(a, b) {
 			value: a
 		}
 	}
+	if (a.__diffComparedTo__ === b && b.__diffComparedTo__ === a) {
+		return true;
+	}
 
 	var value = {};
 	var equal = true;
 
+	a.__diffComparedTo__ = b;
+	b.__diffComparedTo__ = a;
+
 	for (var key in a) {
+		if (key == '__diffComparedTo__') { continue; }
 		if (key in b) {
 			if (a[key] === b[key]) {
 				value[key] = {
@@ -57,6 +64,7 @@ objectDiff.diff = function diff(a, b) {
 	}
 
 	for (key in b) {
+		if (key == '__diffComparedTo__') { continue; }
 		if (!(key in a)) {
 			equal = false;
 			value[key] = {
@@ -65,6 +73,9 @@ objectDiff.diff = function diff(a, b) {
 			}
 		}
 	}
+
+	delete a.__diffComparedTo__;
+	delete b.__diffComparedTo__;
 
 	if (equal) {
 		return {
@@ -93,13 +104,20 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 			value: a
 		}
 	}
+	if (a.__diffComparedTo__ === b && b.__diffComparedTo__ === a) {
+		return true;
+	}
 
 	var diff = {};
 	var equal = true;
 	var keys = Object.keys(a);
 
+	a.__diffComparedTo__ = b;
+	b.__diffComparedTo__ = a;
+
 	for (var i = 0, length = keys.length; i < length; i++) {
 		var key = keys[i];
+		if (key == '__diffComparedTo__') { continue; }
 		if (b.hasOwnProperty(key)) {
 			if (a[key] === b[key]) {
 				diff[key] = {
@@ -142,6 +160,7 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 
 	for (i = 0, length = keys.length; i < length; i++) {
 		key = keys[i];
+		if (key == '__diffComparedTo__') { continue; }
 		if (!a.hasOwnProperty(key)) {
 			equal = false;
 			diff[key] = {
@@ -150,6 +169,9 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 			}
 		}
 	}
+
+	delete a.__diffComparedTo__;
+	delete b.__diffComparedTo__;
 
 	if (equal) {
 		return {
