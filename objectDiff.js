@@ -179,10 +179,16 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b, ignore) {
 	delete a.__diffComparedTo__;
 	delete b.__diffComparedTo__;
 
-	if (equal) {
+	if (equal && (typeof a === typeof b) && (typeof a === 'object')) {
 		return {
 			value: a,
 			changed: 'equal'
+		}
+	} else if (equal) {
+		return {
+			changed: 'primitive change',
+			removed: a,
+			added: b
 		}
 	} else {
 		return {
@@ -205,6 +211,14 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b, ignore) {
 		var diff = changes.value;
 		if (changes.changed == 'equal') {
 			return inspect(diff);
+		} else if (changes.changed == 'primitive change') {
+			return [
+				'<div class="diff-level">',
+				'<del class="diff diff-key">', inspect(changes.removed), '</del>',
+				'<span>,</span>\n',
+				'<ins class="diff diff-key">', inspect(changes.added), '</ins>',
+				'</div>'
+			].join('');
 		}
 
 		for (var key in diff) {
