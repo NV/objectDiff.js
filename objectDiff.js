@@ -107,17 +107,20 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b, ignore) {
 			value: a
 		}
 	}
-	if (a.__diffComparedTo__ === b && b.__diffComparedTo__ === a) {
+	if (a && b && a.__diffComparedTo__ === b && b.__diffComparedTo__ === a) {
 		return true;
 	}
 
 	var diff = {};
 	var equal = true;
-	var keys = Object.keys(a);
+	var typeofA = typeof a;
+	var typeofB = typeof b;
+	var keys = [];
 	var ignoredKeys = ['__diffComparedTo__'].concat(ignore || []);
 
-	a.__diffComparedTo__ = b;
-	b.__diffComparedTo__ = a;
+	if (a && typeofA === 'object') { keys = Object.keys(a); }
+	if (a) { a.__diffComparedTo__ = b; }
+	if (b) { b.__diffComparedTo__ = a; }
 
 	for (var i = 0, length = keys.length; i < length; i++) {
 		var key = keys[i];
@@ -161,7 +164,8 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b, ignore) {
 		}
 	}
 
-	keys = Object.keys(b);
+	keys = [];
+	if (b && typeofB === 'object') { keys = Object.keys(b); }
 
 	for (i = 0, length = keys.length; i < length; i++) {
 		key = keys[i];
@@ -176,10 +180,10 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b, ignore) {
 		}
 	}
 
-	delete a.__diffComparedTo__;
-	delete b.__diffComparedTo__;
+	if (a) { delete a.__diffComparedTo__; }
+	if (b) { delete b.__diffComparedTo__; }
 
-	if (equal && (typeof a === typeof b) && (typeof a === 'object')) {
+	if (equal && (typeofA === typeofB) && (typeofA === 'object')) {
 		return {
 			value: a,
 			changed: 'equal'
