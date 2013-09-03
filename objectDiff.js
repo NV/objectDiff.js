@@ -286,7 +286,8 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b, ignore) {
 		 * @see http://jsperf.com/continuation-passing-style/3
 		 * @return {string}
 		 */
-		function _inspect(accumulator, obj) {
+		function _inspect(accumulator, obj, deep) {
+			deep = deep || 0;
 			switch(typeof obj) {
 				case 'object':
 					if (!obj) {
@@ -300,15 +301,20 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b, ignore) {
 					} else if (obj.nodeType > 0) {
 						accumulator += '<span>' + Object.prototype.toString.call(obj) + '</span>';
 					} else {
-						accumulator += '<span>{</span>\n<div class="diff-level">';
-						for (var i = 0; i < length; i++) {
-							var key = keys[i];
-							accumulator = _inspect(accumulator + stringifyObjectKey(escapeHTML(key)) + '<span>: </span>', obj[key]);
-							if (i < length - 1) {
-								accumulator += '<span>,</span>\n';
+						deep += 1;
+						if (deep > 3) {
+							accumulator += '<span>[too deep...]</span>';
+						} else {
+							accumulator += '<span>{</span>\n<div class="diff-level">';
+							for (var i = 0; i < length; i++) {
+								var key = keys[i];
+								accumulator = _inspect(accumulator + stringifyObjectKey(escapeHTML(key)) + '<span>: </span>', obj[key], deep);
+								if (i < length - 1) {
+									accumulator += '<span>,</span>\n';
+								}
 							}
+							accumulator += '\n</div><span>}</span>'
 						}
-						accumulator += '\n</div><span>}</span>'
 					}
 					break;
 
