@@ -28,7 +28,7 @@
 	</tr>
 </table>
 
-<a class="footer" href="https://github.com/NV/objectDiff.js">objectDiff.js on GitHub</a>
+<a class="footer" href="https://github.com/Darneas/objectDiff.js">objectDiff.js on GitHub</a>
 
 <script src="objectDiff.js"></script>
 <script defer>
@@ -63,7 +63,7 @@ b.onpaste = b.onchange = b.oninput = function changed(e) {
 	}
 
 	if (!bError && !aError) {
-		var diff = objectDiff.diffOwnProperties(aObj, bObj);
+		var diff = objectDiff.basicDiff(aObj, bObj);
 		result.innerHTML = objectDiff.convertToXMLString(diff);
 	}
 };
