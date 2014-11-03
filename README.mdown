@@ -3,7 +3,7 @@
 [objectdiff on npm](http://search.npmjs.org/#/objectdiff)
 
 
-## objectDiff.diff(objectA, objectB)
+## objectDiff.diff(oldObject, newObject)
 
 <pre>
 objectDiff.diff({x: 1}, {x: 2})
@@ -40,7 +40,7 @@ objectDiff.diff({z: {x: 1}}, {z: {y: 2}})
 </pre>
 
 
-## objectDiff.diffOwnProperties(objectA, objectB)
+## objectDiff.diffOwnProperties(oldObject, newObject)
 
 Same as objectDiff.diff, but compares only objects' own properties
 
