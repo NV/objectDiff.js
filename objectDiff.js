@@ -5,7 +5,7 @@ var objectDiff = typeof exports != 'undefined' ? exports : {};
  * @param {Object} b
  * @return {Object}
  */
-objectDiff.diff = function diff(a, b) {
+objectDiff.diff = function diff(a, b, ignore) {
 
 	if (a === b) {
 		return {
@@ -13,11 +13,20 @@ objectDiff.diff = function diff(a, b) {
 			value: a
 		}
 	}
+	if (a.__diffComparedTo__ === b && b.__diffComparedTo__ === a) {
+		return true;
+	}
 
 	var value = {};
 	var equal = true;
+	var ignoredKeys = ['__diffComparedTo__'].concat(ignore || []);
+
+	a.__diffComparedTo__ = b;
+	b.__diffComparedTo__ = a;
 
 	for (var key in a) {
+		if (ignoredKeys.indexOf(key) != -1) { continue; }
+
 		if (key in b) {
 			if (a[key] === b[key]) {
 				value[key] = {
@@ -28,7 +37,7 @@ objectDiff.diff = function diff(a, b) {
 				var typeA = typeof a[key];
 				var typeB = typeof b[key];
 				if (a[key] && b[key] && (typeA == 'object' || typeA == 'function') && (typeB == 'object' || typeB == 'function')) {
-					var valueDiff = diff(a[key], b[key]);
+					var valueDiff = diff(a[key], b[key], ignore);
 					if (valueDiff.changed == 'equal') {
 						value[key] = {
 							changed: 'equal',
@@ -57,6 +66,8 @@ objectDiff.diff = function diff(a, b) {
 	}
 
 	for (key in b) {
+		if (ignoredKeys.indexOf(key) != -1) { continue; }
+
 		if (!(key in a)) {
 			equal = false;
 			value[key] = {
@@ -65,6 +76,9 @@ objectDiff.diff = function diff(a, b) {
 			}
 		}
 	}
+
+	delete a.__diffComparedTo__;
+	delete b.__diffComparedTo__;
 
 	if (equal) {
 		return {
@@ -85,7 +99,7 @@ objectDiff.diff = function diff(a, b) {
  * @param {Object} b
  * @return {Object}
  */
-objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
+objectDiff.diffOwnProperties = function diffOwnProperties(a, b, ignore) {
 
 	if (a === b) {
 		return {
@@ -93,13 +107,25 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 			value: a
 		}
 	}
+	if (a && b && a.__diffComparedTo__ === b && b.__diffComparedTo__ === a) {
+		return true;
+	}
 
 	var diff = {};
 	var equal = true;
-	var keys = Object.keys(a);
+	var typeofA = typeof a;
+	var typeofB = typeof b;
+	var keys = [];
+	var ignoredKeys = ['__diffComparedTo__'].concat(ignore || []);
+
+	if (a && typeofA === 'object') { keys = Object.keys(a); }
+	if (a) { a.__diffComparedTo__ = b; }
+	if (b) { b.__diffComparedTo__ = a; }
 
 	for (var i = 0, length = keys.length; i < length; i++) {
 		var key = keys[i];
+		if (ignoredKeys.indexOf(key) != -1) { continue; }
+
 		if (b.hasOwnProperty(key)) {
 			if (a[key] === b[key]) {
 				diff[key] = {
@@ -110,7 +136,7 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 				var typeA = typeof a[key];
 				var typeB = typeof b[key];
 				if (a[key] && b[key] && (typeA == 'object' || typeA == 'function') && (typeB == 'object' || typeB == 'function')) {
-					var valueDiff = diffOwnProperties(a[key], b[key]);
+					var valueDiff = diffOwnProperties(a[key], b[key], ignore);
 					if (valueDiff.changed == 'equal') {
 						diff[key] = {
 							changed: 'equal',
@@ -138,10 +164,13 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 		}
 	}
 
-	keys = Object.keys(b);
+	keys = [];
+	if (b && typeofB === 'object') { keys = Object.keys(b); }
 
 	for (i = 0, length = keys.length; i < length; i++) {
 		key = keys[i];
+		if (ignoredKeys.indexOf(key) != -1) { continue; }
+
 		if (!a.hasOwnProperty(key)) {
 			equal = false;
 			diff[key] = {
@@ -151,10 +180,19 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 		}
 	}
 
-	if (equal) {
+	if (a) { delete a.__diffComparedTo__; }
+	if (b) { delete b.__diffComparedTo__; }
+
+	if (equal && (typeofA === typeofB) && (typeofA === 'object')) {
 		return {
 			value: a,
 			changed: 'equal'
+		}
+	} else if (equal) {
+		return {
+			changed: 'primitive change',
+			removed: a,
+			added: b
 		}
 	} else {
 		return {
@@ -177,6 +215,14 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 		var diff = changes.value;
 		if (changes.changed == 'equal') {
 			return inspect(diff);
+		} else if (changes.changed == 'primitive change') {
+			return [
+				'<div class="diff-level">',
+				'<del class="diff diff-key">', inspect(changes.removed), '</del>',
+				'<span>,</span>\n',
+				'<ins class="diff diff-key">', inspect(changes.added), '</ins>',
+				'</div>'
+			].join('');
 		}
 
 		for (var key in diff) {
@@ -215,9 +261,7 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 	 * @return {string}
 	 */
 	function stringifyObjectKey(key) {
-		return /^[a-z0-9_$]*$/i.test(key) ?
-			key :
-			JSON.stringify(key);
+		return /^[a-z0-9_$]*$/i.test(key) ? key : JSON.stringify(key);
 	}
 
 	/**
@@ -242,7 +286,8 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 		 * @see http://jsperf.com/continuation-passing-style/3
 		 * @return {string}
 		 */
-		function _inspect(accumulator, obj) {
+		function _inspect(accumulator, obj, deep) {
+			deep = deep || 0;
 			switch(typeof obj) {
 				case 'object':
 					if (!obj) {
@@ -253,21 +298,32 @@ objectDiff.diffOwnProperties = function diffOwnProperties(a, b) {
 					var length = keys.length;
 					if (length === 0) {
 						accumulator += '<span>{}</span>';
+					} else if (obj.nodeType > 0) {
+						accumulator += '<span>' + Object.prototype.toString.call(obj) + '</span>';
 					} else {
-						accumulator += '<span>{</span>\n<div class="diff-level">';
-						for (var i = 0; i < length; i++) {
-							var key = keys[i];
-							accumulator = _inspect(accumulator + stringifyObjectKey(escapeHTML(key)) + '<span>: </span>', obj[key]);
-							if (i < length - 1) {
-								accumulator += '<span>,</span>\n';
+						deep += 1;
+						if (deep > 3) {
+							accumulator += '<span>[too deep...]</span>';
+						} else {
+							accumulator += '<span>{</span>\n<div class="diff-level">';
+							for (var i = 0; i < length; i++) {
+								var key = keys[i];
+								accumulator = _inspect(accumulator + stringifyObjectKey(escapeHTML(key)) + '<span>: </span>', obj[key], deep);
+								if (i < length - 1) {
+									accumulator += '<span>,</span>\n';
+								}
 							}
+							accumulator += '\n</div><span>}</span>'
 						}
-						accumulator += '\n</div><span>}</span>'
 					}
 					break;
 
 				case 'string':
 					accumulator += JSON.stringify(escapeHTML(obj));
+					break;
+
+				case 'function':
+					accumulator += Object.prototype.toString.call(obj);
 					break;
 
 				case 'undefined':
