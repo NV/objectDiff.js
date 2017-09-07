@@ -1,6 +1,6 @@
-#[objectDiff](http://nv.github.com/objectDiff.js/)
+# [objectDiff](http://nv.github.com/objectDiff.js/)
 
-[objectdiff on npm](http://search.npmjs.org/#/objectdiff)
+[objectdiff on npm](https://www.npmjs.com/package/objectdiff)
 
 
 ## objectDiff.diff(objectA, objectB)
