@@ -1,0 +1,21 @@
+{
+  "name": "objectDiff-enhanced",
+  "main": "objectDiff.js",
+  "version": "1.1.1",
+  "homepage": "https://github.com/Darneas/objectDiff.js",
+  "authors": [
+    "Andreas Schmidt <info@portal-as.de>"
+  ],
+  "description": "\"Methods for calculating diff on JavaScript objects.\"",
+  "moduleType": [
+    "node"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
