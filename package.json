@@ -18,7 +18,8 @@
     "url": "https://github.com/NV/objectDiff.js/issues"
   },
   "files": [
-    "objectDiff.js"
+    "objectDiff.js",
+    "objectDiff.css"
   ],
   "main": "objectDiff.js",
   "engines": {
